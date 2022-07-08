@@ -21,3 +21,4 @@ Example: Blue color palace is themed around water, yellow is themed around elect
 ## How to Compile
 
 [here](https://haxeflixel.com/documentation/getting-started/)
+
