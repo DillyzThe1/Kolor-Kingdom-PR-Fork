@@ -5,7 +5,7 @@
 - Added offsets to the temporary player
 - Disabled tracing in release mode
 - Enabled dead code elimination
-- Added Adobe Animate project file
+- Updated Adobe Animate project file
 - Added placeholder ClientPrefs class
 - More efficently programming in FlxNerd
 - Took OffsetState from ColorCove
