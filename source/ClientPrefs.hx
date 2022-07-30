@@ -1,0 +1,7 @@
+package;
+
+// GUYS I CAN'T BELIVE IGT FNF ASLRREVFEW GBWEHG WSEHKUJG HWSEKJUG HJMESWHG JMYSAEJG SHJEYM H
+class ClientPrefs
+{
+	var antialiasing:Bool = true;
+}

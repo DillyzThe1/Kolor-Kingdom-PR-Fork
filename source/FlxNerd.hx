@@ -4,6 +4,6 @@ class FlxNerd
 {
 	public static function nerd(nerdSpeech:Dynamic)
 	{
-		return '"' + nerdSpeech.toString() + ' :nerd:';
+		return '"${nerdSpeech.toString()}" :nerd:';
 	}
 }

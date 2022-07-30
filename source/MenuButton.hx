@@ -2,16 +2,19 @@ package;
 
 import flixel.FlxG;
 import flixel.FlxSprite;
+import flixel.math.FlxPoint;
 import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
 
-class MenuButton extends FlxSprite
+class MenuButton extends KKSprite
 {
 	var side:String;
 
 	public var selected:Bool = false;
+	public var confirmed:Bool = false;
+	public var tweening:Bool = false;
 
 	var tween:FlxTween;
 	var ogX:Float;
@@ -21,19 +24,21 @@ class MenuButton extends FlxSprite
 
 	override public function new(x:Float, y:Float, type:String)
 	{
-		super(x, y);
+		super(x, y, 'buttons', true);
 
 		ogX = this.x;
 		ogY = this.y;
 		globalType = type;
 
-		this.frames = LazyPathStuff.getXml("buttons");
-		this.animation.addByPrefix("idle", type + " idle", 24, true);
+		this.addAnim("start", "start idle", new FlxPoint(0, 0), 24, true);
+		this.addAnim("startConfirm", "start confirm", new FlxPoint(0, 8));
+		this.addAnim("options", "options idle", new FlxPoint(0, 0), 24, true);
+		this.addAnim("multiplayer", "multiplayer idle", new FlxPoint(0, 0), 24, true);
+		this.addAnim("achievements", "achievements idle", new FlxPoint(0, 0), 24, true);
+		this.addAnim("quit", "quit idle", new FlxPoint(0, 0), 24, true);
+		this.addAnim("quitConfirm", "quit confirm", new FlxPoint(10, 40));
 
-		if (type == "start" || type == "quit")
-			this.animation.addByPrefix("confirm", type + " confirm", 24, true);
-
-		this.animation.play("idle", true);
+		this.playAnim(type, true);
 
 		if (type == "start" || type == "multiplayer")
 			side = "left";
@@ -47,64 +52,70 @@ class MenuButton extends FlxSprite
 	{
 		super.update(elapsed);
 
-		if (FlxG.mouse.overlaps(this) && !selected)
+		if (!confirmed || !tweening)
 		{
-			FlxG.sound.play(LazyPathStuff.soundPath("buttonHover.ogg"));
+			if (FlxG.mouse.overlaps(this) && !selected)
+			{
+				FlxG.sound.play(LazyPathStuff.soundPath("buttonHover.ogg"));
 
-			selected = true;
-			if (tween != null)
-				tween.cancel();
+				selected = true;
+				if (tween != null)
+					tween.cancel();
 
-			if (side == "left")
-				tween = FlxTween.tween(this, {x: ogX + 20}, 0.2, {ease: FlxEase.cubeInOut});
-			else if (side == "right")
-				tween = FlxTween.tween(this, {x: ogX - 20}, 0.2, {ease: FlxEase.cubeInOut});
-			else if (side == "bottom")
-				tween = FlxTween.tween(this, {y: ogY - 20}, 0.2, {ease: FlxEase.cubeInOut});
-		}
-		else if (!FlxG.mouse.overlaps(this) && selected)
-		{
-			FlxG.sound.play(LazyPathStuff.soundPath("buttonDeselect.ogg"));
+				if (side == "left")
+					tween = FlxTween.tween(this, {x: ogX + 20}, 0.2, {ease: FlxEase.cubeInOut});
+				else if (side == "right")
+					tween = FlxTween.tween(this, {x: ogX - 20}, 0.2, {ease: FlxEase.cubeInOut});
+				else if (side == "bottom")
+					tween = FlxTween.tween(this, {y: ogY - 20}, 0.2, {ease: FlxEase.cubeInOut});
+			}
+			else if (!FlxG.mouse.overlaps(this) && selected)
+			{
+				FlxG.sound.play(LazyPathStuff.soundPath("buttonDeselect.ogg"));
 
-			selected = false;
-			if (tween != null)
-				tween.cancel();
+				selected = false;
+				if (tween != null)
+					tween.cancel();
 
-			if (side == "left")
-				tween = FlxTween.tween(this, {x: ogX}, 0.2, {ease: FlxEase.cubeInOut});
-			else if (side == "right")
-				tween = FlxTween.tween(this, {x: ogX}, 0.2, {ease: FlxEase.cubeInOut});
-			else if (side == "bottom")
-				tween = FlxTween.tween(this, {y: ogY}, 0.2, {ease: FlxEase.cubeInOut});
+				if (side == "left")
+					tween = FlxTween.tween(this, {x: ogX}, 0.2, {ease: FlxEase.cubeInOut});
+				else if (side == "right")
+					tween = FlxTween.tween(this, {x: ogX}, 0.2, {ease: FlxEase.cubeInOut});
+				else if (side == "bottom")
+					tween = FlxTween.tween(this, {y: ogY}, 0.2, {ease: FlxEase.cubeInOut});
+			}
 		}
 	}
 
 	public function clicked()
 	{
 		if (globalType == "start" || globalType == "quit")
-			this.animation.play("confirm");
-
-		FlxG.sound.play(LazyPathStuff.soundPath("buttonConfirm.ogg"));
-		var clickedTimer:FlxTimer = new FlxTimer();
-		clickedTimer.start(1, function(time:FlxTimer)
 		{
-			if (globalType == "quit")
+			confirmed = true;
+			this.animation.play('${globalType}Confirm');
+
+			FlxG.sound.play(LazyPathStuff.soundPath("buttonConfirm.ogg"));
+			var clickedTimer:FlxTimer = new FlxTimer();
+			clickedTimer.start(1, function(time:FlxTimer)
 			{
-				#if (desktop && cpp)
-				Sys.exit(0);
-				#end
-			}
-			else if (globalType == "start")
-			{
-				FlxG.camera.fade(FlxColor.BLACK, 0.5, false, function()
+				if (globalType == "quit")
 				{
-					FlxG.switchState(new PlayState());
-				});
-			}
-			else
-			{
-				trace("no functionality :sad_sping_bing:");
-			}
-		}, 0);
+					#if (desktop && cpp)
+					Sys.exit(0);
+					#end
+				}
+				else if (globalType == "start")
+				{
+					FlxG.camera.fade(FlxColor.BLACK, 0.5, false, function()
+					{
+						FlxG.switchState(new PlayState());
+					});
+				}
+				else
+				{
+					trace("no functionality :sad_sping_bing:");
+				}
+			}, 0);
+		}
 	}
 }

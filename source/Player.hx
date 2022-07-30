@@ -1,21 +1,21 @@
 package;
 
+import KKSprite;
 import flixel.FlxG;
-import flixel.FlxSprite;
+import flixel.math.FlxPoint;
 
-class Player extends FlxSprite
+class Player extends KKSprite
 {
 	var intendedAnim:String = "idle";
 	var isRunning:Bool = false;
 
 	override public function new(x:Float, y:Float)
 	{
-		super(x, y);
+		super(x, y, "player", true);
 
-		this.frames = LazyPathStuff.getXml("player");
-		this.animation.addByPrefix("idle", "idle", 24, true);
-		this.animation.addByPrefix("run", "stop running :nerd:", 24, true);
-		this.animation.play("idle");
+		this.addAnim("idle", "idle", new FlxPoint(0, 0), 24, true);
+		this.addAnim("run", "stop running :nerd:", new FlxPoint(0, 0), 24, true);
+		this.playAnim("idle");
 	}
 
 	override public function update(elapsed:Float)
@@ -53,6 +53,11 @@ class Player extends FlxSprite
 			isRunning = false;
 			intendedAnim = "idle";
 		}
+
+		if (flipX && intendedAnim != "idle")
+			this.offset.set(50, 0);
+		else
+			this.offset.set(0, 0);
 
 		if (this.animation.curAnim.name != intendedAnim)
 		{
