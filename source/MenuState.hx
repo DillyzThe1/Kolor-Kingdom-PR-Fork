@@ -1,6 +1,7 @@
 package;
 
 import KKSprite;
+import MenuButton.ButtonSide;
 import flixel.FlxG;
 import flixel.FlxState;
 import flixel.math.FlxPoint;
@@ -15,31 +16,36 @@ class MenuState extends KKState
 	var options:MenuButton;
 	var multiplayer:MenuButton;
 	var achievements:MenuButton;
+	#if (desktop && cpp)
 	var quit:MenuButton;
+	#end
+
+	var buttons:Array<MenuButton>;
 
 	override public function create()
 	{
+		super.create();
+
 		FlxG.camera.bgColor = FlxColor.WHITE;
 
-		play = new MenuButton(-100, 0, "start");
+		play = new MenuButton(-100, 0, "start", ButtonSide.LEFT);
 		add(play);
 
-		options = new MenuButton(980, 0, "options");
-		options.alpha = 0.7;
+		options = new MenuButton(980, 0, "options", ButtonSide.RIGHT, false);
 		add(options);
 
-		multiplayer = new MenuButton(-100, 0, "multiplayer");
-		multiplayer.alpha = 0.7;
+		multiplayer = new MenuButton(-100, 0, "multiplayer", ButtonSide.LEFT, false);
 		add(multiplayer);
 
-		achievements = new MenuButton(920, 0, "achievements");
-		achievements.alpha = 0.7;
+		achievements = new MenuButton(920, 0, "achievements", ButtonSide.RIGHT, false);
 		add(achievements);
 
-		quit = new MenuButton(0, 620, "quit");
+		#if (desktop && cpp)
+		quit = new MenuButton(0, 620, "quit", ButtonSide.DOWN);
 		quit.screenCenter(X);
 		quit.x += 70;
 		add(quit);
+		#end
 
 		logo = new KKSprite(0, 10, "logo", true);
 		logo.screenCenter(X);
@@ -52,9 +58,9 @@ class MenuState extends KKState
 		multiplayer.y = options.y + 85;
 		achievements.y = multiplayer.y + 85;
 
-		trace(FlxNerd.nerd("momazos diego"));
+		buttons = [play, options, multiplayer, achievements, #if (desktop && cpp) quit #end];
 
-		super.create();
+		trace(FlxNerd.nerd("momazos diego"));
 	}
 
 	override public function update(elapsed:Float)
@@ -65,22 +71,9 @@ class MenuState extends KKState
 			FlxG.sound.playMusic(LazyPathStuff.songPath("funny game menu.ogg"));
 
 		if (FlxG.mouse.justPressed)
-		{
-			var buttons = [play, options, multiplayer, achievements, quit];
-
 			for (i in buttons)
-			{
-				if (i.selected)
-				{
-					if (!i.confirmed)
-					{
-						i.clicked();
-						if (i == play || i == quit)
-							tweenButtons(i);
-					}
-				}
-			}
-		}
+				if (i.selected && !i.confirmed && i.clicked())
+					tweenButtons(i);
 
 		#if debug
 		if (FlxG.keys.justPressed.NINE)
@@ -104,7 +97,9 @@ class MenuState extends KKState
 			FlxTween.tween(multiplayer, {x: multiplayer.x - 500}, 0.5, {ease: FlxEase.backIn});
 		if (type != achievements)
 			FlxTween.tween(achievements, {x: achievements.x + 500}, 0.5, {ease: FlxEase.backIn});
+		#if (desktop && cpp)
 		if (type != quit)
 			FlxTween.tween(quit, {y: quit.y + 500}, 0.5, {ease: FlxEase.backIn});
+		#end
 	}
 }
