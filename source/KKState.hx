@@ -8,7 +8,7 @@ class KKState extends FlxState
 	{
 		super.create();
 		if (FadeManager.nextFadeIn)
-			FlxG.camera.fade(FlxColor.BLACK, FadeManager.nextFadeDuration, true);
+			FlxG.camera.fade(FadeManager.nextFadeColor, FadeManager.nextFadeDuration, true);
 		FadeManager.nextFadeIn = false;
 	}
 }
