@@ -20,9 +20,9 @@ class KKSprite extends FlxSprite
 			this.loadGraphic(LazyPathStuff.imagePath(image, subfolder));
 	}
 
-	public function addAnim(name:String, prefix:String, offset:FlxPoint, fps:Int = 24, loop:Bool = false)
+	public function addAnim(name:String, prefix:String, offset:FlxPoint, ?fps:Int = 24, ?loop:Bool = false, ?flipX:Bool = false, ?flipY:Bool = false)
 	{
-		this.animation.addByPrefix(name, prefix, fps, loop);
+		this.animation.addByPrefix(name, prefix, fps, loop, flipX, flipY);
 		animOffsets.set(name, offset);
 	}
 

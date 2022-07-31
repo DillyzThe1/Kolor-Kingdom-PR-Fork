@@ -4,6 +4,8 @@ import KKSprite;
 import flixel.FlxG;
 import flixel.math.FlxPoint;
 
+using StringTools;
+
 class Player extends KKSprite
 {
 	var intendedAnim:String = "idle";
@@ -14,9 +16,12 @@ class Player extends KKSprite
 		super(x, y, "player", true);
 
 		this.addAnim("idle", "idle", new FlxPoint(0, 0), 24, true);
-		this.addAnim("run", "stop running :nerd:", new FlxPoint(0, 0), 24, true);
+		this.addAnim("runRight", "stop running :nerd:", new FlxPoint(0, 0), 24, true);
+		this.addAnim("runLeft", "stop running :nerd:", new FlxPoint(50, 0), 24, true);
 		this.playAnim("idle");
 	}
+
+	var lastRunLeft:Bool = false;
 
 	override public function update(elapsed:Float)
 	{
@@ -26,27 +31,27 @@ class Player extends KKSprite
 		{
 			isRunning = true;
 			this.x = this.x - 5;
-			intendedAnim = "run";
-			this.flipX = true;
+			intendedAnim = "runLeft";
+			this.flipX = lastRunLeft = true;
 		}
 		else if (FlxG.keys.pressed.RIGHT)
 		{
 			isRunning = true;
 			this.x = this.x + 5;
-			intendedAnim = "run";
-			this.flipX = false;
+			intendedAnim = "runRight";
+			this.flipX = lastRunLeft = false;
 		}
 		if (FlxG.keys.pressed.UP)
 		{
 			isRunning = true;
 			this.y = this.y - 5;
-			intendedAnim = "run";
+			intendedAnim = 'run${lastRunLeft ? 'Left' : 'Right'}';
 		}
 		else if (FlxG.keys.pressed.DOWN)
 		{
 			isRunning = true;
 			this.y = this.y + 5;
-			intendedAnim = "run";
+			intendedAnim = 'run${lastRunLeft ? 'Left' : 'Right'}';
 		}
 		if (!FlxG.keys.pressed.LEFT && !FlxG.keys.pressed.RIGHT && !FlxG.keys.pressed.DOWN && !FlxG.keys.pressed.UP && isRunning)
 		{
@@ -54,15 +59,8 @@ class Player extends KKSprite
 			intendedAnim = "idle";
 		}
 
-		if (flipX && intendedAnim != "idle")
-			this.offset.set(50, 0);
-		else
-			this.offset.set(0, 0);
-
 		if (this.animation.curAnim.name != intendedAnim)
-		{
-			this.animation.play(intendedAnim, true);
-		}
+			this.playAnim(intendedAnim, true, false, this.animation.curAnim.name.startsWith("run") ? this.animation.curAnim.curFrame : 0);
 	}
 }
 /*  ⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⢀⣀⡀⠄⠄⠄⠄⠄⠄⠄⠄⣀⣀⣀⠄⠄⠄⠄⠄⠄⢰⠄⠄⠄⠄⠄⠄⠄⠄⣀⡀⠄⠄⠄⠄⠄⠄
