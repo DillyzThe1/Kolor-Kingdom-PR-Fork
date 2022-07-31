@@ -2,14 +2,20 @@ package;
 
 import flixel.FlxG;
 import flixel.FlxState;
+import flixel.util.FlxColor;
 
 class FadeManager
 {
-	/*public static function fadeAndSwitchState(duration:Float, fadeIn:Bool, state:FlxState)
+	public static var nextFadeIn:Bool = false;
+	public static var nextFadeDuration:Float = 0.5;
+
+	public static function fadeAndSwitchState(newState:Class<FlxState>, ?duration:Float = 0.5)
+	{
+		FlxG.camera.fade(FlxColor.BLACK, duration, false, function()
 		{
-			FlxG.camera.fade(FlxColor.BLACK, duration, fadeIn, function()
-			{
-				FlxG.switchState(new state());
-			});
-	}*/
+			nextFadeIn = true;
+			nextFadeDuration = duration;
+			FlxG.switchState(Type.createInstance(newState, []));
+		});
+	}
 }

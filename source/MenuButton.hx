@@ -106,10 +106,7 @@ class MenuButton extends KKSprite
 				}
 				else if (globalType == "start")
 				{
-					FlxG.camera.fade(FlxColor.BLACK, 0.5, false, function()
-					{
-						FlxG.switchState(new PlayState());
-					});
+					FadeManager.fadeAndSwitchState(PlayState);
 				}
 				else
 				{
