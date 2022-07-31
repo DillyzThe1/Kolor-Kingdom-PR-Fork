@@ -9,6 +9,7 @@
 - Added placeholder ClientPrefs class
 - More efficently programming in FlxNerd
 - Took OffsetState from ColorCove
+- Implemented smooth FadeManager system
 # 0.0.0.0.0.0.0.0.0.1 (Game-Jam Pre-Release)
 - Added Main Menu
 - Added temporary PlayState

@@ -8,7 +8,7 @@ import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
 
-class MenuState extends FlxState
+class MenuState extends KKState
 {
 	var logo:KKSprite;
 	var play:MenuButton;
@@ -84,7 +84,8 @@ class MenuState extends FlxState
 
 		#if debug
 		if (FlxG.keys.justPressed.NINE)
-			FlxG.switchState(new OffsetState());
+			FadeManager.fadeAndSwitchState(OffsetState);
+		// FlxG.switchState(new OffsetState());
 		#end
 	}
 

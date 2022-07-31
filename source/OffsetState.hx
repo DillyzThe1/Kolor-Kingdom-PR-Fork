@@ -10,7 +10,7 @@ import flixel.util.FlxColor;
 
 // i freely update the sprite stuff as i offset more stuff
 // taken from color cove and modified to work correctly (no ccsprite class :nbimi:)
-class OffsetState extends FlxState
+class OffsetState extends KKState
 {
 	public var debugSprBG:KKSprite;
 	public var debugSpr:KKSprite;
@@ -118,7 +118,7 @@ class OffsetState extends FlxState
 						debugPoint = debugSpr.animOffsets.get(debugAnim);
 						debugSpr.playAnim(debugAnim, true);
 					case 7 | 8:
-						FlxG.switchState(new MenuState());
+						FadeManager.fadeAndSwitchState(MenuState);
 				}
 
 		debugText.text = '$debugAnim: [${debugPoint.x}, ${debugPoint.y}]';
