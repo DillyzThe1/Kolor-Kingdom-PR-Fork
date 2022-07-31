@@ -8,9 +8,17 @@ import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
 
+enum ButtonSide
+{
+	LEFT;
+	RIGHT;
+	UP;
+	DOWN;
+}
+
 class MenuButton extends KKSprite
 {
-	var side:String;
+	var buttonSide:ButtonSide;
 
 	public var selected:Bool = false;
 	public var confirmed:Bool = false;
@@ -22,13 +30,18 @@ class MenuButton extends KKSprite
 
 	public var globalType:String;
 
-	override public function new(x:Float, y:Float, type:String)
+	var buttonEnabled:Bool;
+
+	override public function new(x:Float, y:Float, type:String, ?buttonSide:ButtonSide = ButtonSide.LEFT, ?buttonEnabled:Bool = true)
 	{
 		super(x, y, 'buttons', true);
 
 		ogX = this.x;
 		ogY = this.y;
 		globalType = type;
+		this.buttonEnabled = buttonEnabled;
+		alpha = buttonEnabled ? 1 : 0.7;
+		this.buttonSide = buttonSide;
 
 		this.addAnim("start", "start idle", new FlxPoint(0, 0), 24, true);
 		this.addAnim("startConfirm", "start confirm", new FlxPoint(0, 8));
@@ -39,20 +52,13 @@ class MenuButton extends KKSprite
 		this.addAnim("quitConfirm", "quit confirm", new FlxPoint(10, 40));
 
 		this.playAnim(type, true);
-
-		if (type == "start" || type == "multiplayer")
-			side = "left";
-		else if (type == "options" || type == "achievements")
-			side = "right";
-		else if (type == "quit")
-			side = "bottom";
 	}
 
 	override public function update(elapsed:Float)
 	{
 		super.update(elapsed);
 
-		if (!confirmed || !tweening)
+		if ((!confirmed || !tweening) && buttonEnabled)
 		{
 			if (FlxG.mouse.overlaps(this) && !selected)
 			{
@@ -62,12 +68,17 @@ class MenuButton extends KKSprite
 				if (tween != null)
 					tween.cancel();
 
-				if (side == "left")
-					tween = FlxTween.tween(this, {x: ogX + 20}, 0.2, {ease: FlxEase.cubeInOut});
-				else if (side == "right")
-					tween = FlxTween.tween(this, {x: ogX - 20}, 0.2, {ease: FlxEase.cubeInOut});
-				else if (side == "bottom")
-					tween = FlxTween.tween(this, {y: ogY - 20}, 0.2, {ease: FlxEase.cubeInOut});
+				switch (buttonSide)
+				{
+					case ButtonSide.LEFT:
+						tween = FlxTween.tween(this, {x: ogX + 20}, 0.2, {ease: FlxEase.cubeInOut});
+					case ButtonSide.RIGHT:
+						tween = FlxTween.tween(this, {x: ogX - 20}, 0.2, {ease: FlxEase.cubeInOut});
+					case ButtonSide.DOWN:
+						tween = FlxTween.tween(this, {y: ogY - 20}, 0.2, {ease: FlxEase.cubeInOut});
+					case ButtonSide.UP:
+						tween = FlxTween.tween(this, {y: ogY + 20}, 0.2, {ease: FlxEase.cubeInOut});
+				}
 			}
 			else if (!FlxG.mouse.overlaps(this) && selected)
 			{
@@ -77,19 +88,20 @@ class MenuButton extends KKSprite
 				if (tween != null)
 					tween.cancel();
 
-				if (side == "left")
-					tween = FlxTween.tween(this, {x: ogX}, 0.2, {ease: FlxEase.cubeInOut});
-				else if (side == "right")
-					tween = FlxTween.tween(this, {x: ogX}, 0.2, {ease: FlxEase.cubeInOut});
-				else if (side == "bottom")
-					tween = FlxTween.tween(this, {y: ogY}, 0.2, {ease: FlxEase.cubeInOut});
+				switch (buttonSide)
+				{
+					case ButtonSide.LEFT | ButtonSide.RIGHT:
+						tween = FlxTween.tween(this, {x: ogX}, 0.2, {ease: FlxEase.cubeInOut});
+					case ButtonSide.DOWN | ButtonSide.UP:
+						tween = FlxTween.tween(this, {y: ogY}, 0.2, {ease: FlxEase.cubeInOut});
+				}
 			}
 		}
 	}
 
 	public function clicked()
 	{
-		if (globalType == "start" || globalType == "quit")
+		if (buttonEnabled)
 		{
 			confirmed = true;
 			this.animation.play('${globalType}Confirm');
@@ -98,21 +110,20 @@ class MenuButton extends KKSprite
 			var clickedTimer:FlxTimer = new FlxTimer();
 			clickedTimer.start(1, function(time:FlxTimer)
 			{
-				if (globalType == "quit")
+				switch (globalType.toLowerCase())
 				{
 					#if (desktop && cpp)
-					Sys.exit(0);
+					case 'quit':
+						Sys.exit(0);
 					#end
-				}
-				else if (globalType == "start")
-				{
-					FadeManager.fadeAndSwitchState(PlayState);
-				}
-				else
-				{
-					trace("no functionality :sad_sping_bing:");
+					case 'start':
+						FadeManager.fadeAndSwitchState(PlayState);
+					default:
+						trace('WARNING: You need to add a switch case in MenuButton.hx for ${globalType.toLowerCase()}!');
 				}
 			}, 0);
+			return true;
 		}
+		return false;
 	}
 }
